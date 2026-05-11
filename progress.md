@@ -100,16 +100,20 @@ Two RAG agents with different embedding models sharing the same KB and LLM:
 - `AGENTS` dict configures both agents (model, label, speed, emoji, color, collection name)
 
 ### 10. Deployment (Free, 24/7, $0/mo)
-- **Option A — Hugging Face Spaces:** Docker-based, free 16GB RAM, 2 vCPUs, 50GB storage. Pre-downloads models in Docker build. Listens on port 7860 (`PORT` env var). Sleeps after 48h inactive (wakes on request).
+- **Option A — Hugging Face Spaces (LIVE):** Docker-based, free 16GB RAM, 2 vCPUs, 50GB storage. Pre-downloads models in Docker build. Listens on port 7860 (`PORT` env var). Sleeps after 48h inactive (wakes on request).
+  - **Space:** `adedapo/car_dealership_chatbot` at https://huggingface.co/spaces/adedapo/car_dealership_chatbot
+  - **GitHub sync:** `ramonesimone/car_dealership` — auto-deploys on push
+  - **Secret:** `GROQ_API_KEY` set in HF Space Settings → Repository secrets
+  - **Build:** Docker build ~15-20 min first time (PyTorch + models), cached after
 - **Option B — Koyeb:** Dockerfile-based, 512MB RAM, always-on. Pre-downloads models in Docker build.
-- **Files:** `Dockerfile`, `.dockerignore` (HF Spaces / Koyeb)
+- **Files:** `Dockerfile`, `.dockerignore`
 - **LLM:** Groq API — free tier: 30 req/min, 14,400 req/day (Llama 3 8B)
 - **Embeddings:** Two models; only one loaded in memory at a time (lazy swap)
 - **Vector DB:** Two ChromaDB ephemeral collections (`bob_kb`, `june_kb`) — rebuilt on each cold start (~15s)
 
 ### 11. Requirements
 - **File:** `car_dealership/requirements.txt`
-- `fastapi`, `uvicorn`, `groq`, `chromadb`, `sentence-transformers`, `pydantic`, `langdetect`
+- `fastapi`, `uvicorn`, `groq`, `chromadb`, `sentence-transformers`, `pydantic`, `langdetect`, `python-dotenv`
 
 ### 12. README
 - **File:** `car_dealership/README.md`
@@ -122,11 +126,11 @@ Two RAG agents with different embedding models sharing the same KB and LLM:
 ```
 C:\Users\HP\projects\car_dealership\
 ├── app\
-│   ├── config.py              # Settings (env vars + defaults, AGENTS map)
-│   ├── main.py                # FastAPI server (3 routes, agent param)
-│   ├── rag_engine.py          # Dual-agent RAG pipeline (Bob & June)
+│   ├── config.py              # Settings (env vars + dotenv, AGENTS map, SUPPORTED_LANGUAGES)
+│   ├── main.py                # FastAPI server (3 routes, agent + language params)
+│   ├── rag_engine.py          # Dual-agent RAG pipeline (Bob & June, lazy model loading)
 │   └── static\
-│       └── index.html         # Chat UI (agent selector, lang selector, speed badges)
+│       └── index.html         # Chat UI (agent selector, lang selector, speed badges, dark theme)
 ├── knowledge_base\
 │   ├── 01_company_info.md     # T&C AUTOS company profile
 │   ├── 02_services.md         # Service menu + pricing
@@ -167,20 +171,23 @@ C:\Users\HP\projects\car_dealership\
 
 ## Deployment Instructions
 
-### Option A: Hugging Face Spaces (Recommended)
+### Option A: Hugging Face Spaces (Live)
 
-1. Push the repo to GitHub (or upload directly)
-2. Go to https://huggingface.co/new-space
-3. Set Space name (e.g. `tcautos-chatbot`)
-4. **SDK:** Select "Docker"
-5. **Space type:** Free
-6. **Hardware:** CPU (free) — 16GB RAM, 2 vCPUs
-7. Connect your GitHub repo (or use "Space Docker" for manual upload)
-8. Create the Space
-9. Go to **Settings → Repository Secrets** → Add:
-   - `GROQ_API_KEY` = your Groq API key
-10. Wait for the Docker build (~15-20 min first time, cached after)
-11. Open `https://username-tcautos-chatbot.hf.space` 🎉
+- **Space:** https://huggingface.co/spaces/adedapo/car_dealership_chatbot
+- **URL:** https://adedapo-car-dealership-chatbot.hf.space
+- **GitHub sync:** Push to `ramonesimone/car_dealership` → auto-deploys
+- **Secret:** `GROQ_API_KEY` set in Settings → Repository secrets
+
+To redeploy after changes: `git push origin master` (triggers HF build).
+
+### Option B: Create a New Space
+
+1. Go to https://huggingface.co/new-space
+2. Set Space name
+3. **SDK:** Select "Docker"
+4. **Space type:** Free
+5. Connect your GitHub repo
+6. Add `GROQ_API_KEY` in Settings → Repository secrets
 
 ### Option B: Koyeb
 
@@ -200,7 +207,7 @@ C:\Users\HP\projects\car_dealership\
 | No lead capture | Low | User opted out, but could be added: detect "I want to buy/test drive" intents → save to DB |
 | ~~No multi-language support~~ | ~~Medium~~ | **Done** — 12 languages + auto-detect |
 | In-memory ChromaDB = cold start on deploy | Low | ~15s rebuild (two collections). Could be optimized by pre-computing embeddings and loading from file |
-| Vercel cold start with Bob | Low | Bob's model (470MB) downloads on first request after idle. Warm instances persist with Fluid compute |
+| HF Spaces sleeps after 48h inactivity | Low | Free Spaces go to sleep. Wakes on first request (~30s cold start). Upgrade to paid for always-on |
 | Vehicle inventory is synthetic | High | Replace `07_inventory.md` with real dealership inventory feed |
 | No authentication | Medium | Add simple password or API key for production use |
 | Groq free tier limits | Medium | 30 req/min, 14,400/day. Should upgrade to paid tier if traffic grows |
@@ -245,5 +252,47 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port ${PORT:-7860}
 
 ---
 
-*Handoff prepared: May 11, 2026*
-*Stack: Python 3.12, FastAPI, Groq API, sentence-transformers, ChromaDB, Koyeb*
+*Handoff prepared: May 11, 2026 — Session 2*
+*Stack: Python 3.12, FastAPI, Groq API, sentence-transformers (multilingual), ChromaDB, HF Spaces*
+
+## Session 2 — What Was Done
+
+| Task | Status |
+|------|--------|
+| Multi-language support (12 languages + auto-detect via `langdetect`) | Done |
+| Dual-agent system (Bob 🐢 Slow multilingual / June ⚡ Fast English) | Done |
+| Lazy model loading — only one embedder in RAM at a time | Done |
+| Language selector + agent selector in chat UI header | Done |
+| Agent speed badges on assistant message bubbles | Done |
+| `.env` file with `python-dotenv` auto-loading | Done |
+| Git repo initialized + pushed to `ramonesimone/car_dealership` | Done |
+| HF Space `adedapo/car_dealership_chatbot` created (GitHub sync) | Done |
+| Vercel attempted — blocked by PyTorch bundle size (5GB > 500MB limit) | Blocked |
+
+### Files Modified This Session
+
+| File | Change |
+|------|--------|
+| `app/config.py` | Added `AGENTS` dict, `SUPPORTED_LANGUAGES` map, `DEFAULT_AGENT`, `DEFAULT_LANGUAGE`, `python-dotenv` |
+| `app/rag_engine.py` | Dual-agent RAG engine, `_load_embedder()` lazy swap, `detect_language()`, `resolve_language()`, language in system prompt |
+| `app/main.py` | `language` + `agent` fields in `ChatRequest`, `agent` in `ChatResponse` |
+| `app/static/index.html` | Agent selector, language selector, speed badges on bubbles, CSS for both |
+| `requirements.txt` | Added `langdetect`, `python-dotenv` |
+| `Dockerfile` | Port changed to `$PORT` env var (HF Spaces uses 7860), both models pre-downloaded |
+| `.gitignore` | Created with `.env`, `__pycache__/`, etc. |
+| `.dockerignore` | Added `.env.txt` |
+| `progress.md` | Updated throughout |
+
+### Files Created This Session
+
+| File | Purpose |
+|------|---------|
+| `vercel.json` | Vercel FastAPI config (unused — kept as reference) |
+| `.vercelignore` | Vercel bundle excludes (unused — kept as reference) |
+
+### Next Steps / High Priority
+
+1. **Check HF Space build** — verify the Docker build completes and the chatbot is accessible
+2. **Replace synthetic inventory** — swap `07_inventory.md` with real dealership data
+3. **Authentication** — add password/API key before sharing publicly
+4. **Koyeb** — try if HF Spaces free tier sleep policy is an issue
