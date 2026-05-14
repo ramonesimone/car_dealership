@@ -1,3 +1,12 @@
+---
+title: T&C AUTOS RAG Chatbot
+emoji: 🚗
+colorFrom: red
+colorTo: gray
+sdk: docker
+app_port: 7860
+---
+
 # T&C AUTOS RAG Chatbot
 
 AI-powered chatbot for T&C AUTOS, a Silicon Valley car dealership. Built with Groq API (free LLM), sentence-transformers (free embeddings), ChromaDB, and FastAPI.

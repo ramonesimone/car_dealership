@@ -1,14 +1,19 @@
 FROM python:3.12-slim
 
-WORKDIR /app
+RUN useradd -m -u 1000 user
 
-COPY requirements.txt .
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH
+
+WORKDIR $HOME/app
+
+COPY --chown=user requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')"
 RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
 
-COPY . .
+COPY --chown=user . .
 
 EXPOSE 7860
 
