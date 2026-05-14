@@ -44,8 +44,14 @@ def health():
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
-    result = engine.answer(req.message, req.history, req.language, req.agent)
-    return ChatResponse(reply=result["reply"], sources=result["sources"], agent=result["agent"])
+    try:
+        result = engine.answer(req.message, req.history, req.language, req.agent)
+        return ChatResponse(reply=result["reply"], sources=result["sources"], agent=result["agent"])
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        from fastapi.responses import JSONResponse
+        return JSONResponse(status_code=500, content={"error": str(e), "traceback": traceback.format_exc()})
 
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
