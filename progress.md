@@ -338,3 +338,12 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port ${PORT:-7860}
 | `Dockerfile` | Fixed user permissions for HF Spaces |
 | `app/config.py` | Updated LLM_MODEL to llama-3.1-8b-instant |
 | `progress.md` | Updated throughout |
+| `scripts/test_images.py` | Test script for image preview feature |
+
+---
+
+*Handoff: May 15, 2026 — Session 3 (final)*
+*Stack: Python 3.12, FastAPI, Groq API, sentence-transformers, ChromaDB, HF Spaces, Pollinations.ai*
+
+**Live URL:** https://adedapoojo-car-dealership-chatbot.hf.space
+**GitHub:** https://github.com/ramonesimone/car_dealership
