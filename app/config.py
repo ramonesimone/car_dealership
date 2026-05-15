@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 KB_DIR = BASE_DIR / "knowledge_base"
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-LLM_MODEL = os.getenv("LLM_MODEL", "llama3-8b-8192")
+LLM_MODEL = os.getenv("LLM_MODEL", "llama-3.1-8b-instant")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
 
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "500"))
