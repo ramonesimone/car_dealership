@@ -36,6 +36,7 @@ def vehicle_to_doc(row):
     feature_str = f" This {', '.join(features)}." if features else ""
 
     return f"""## {row['year']} {row['make']} {row['model']}
+- **Vehicle ID:** {row['vehicle_id']}
 - **VIN:** {row['vin']}
 - **Condition:** {row['condition']}
 - **Mileage:** {int(row['mileage']):,} miles

@@ -292,7 +292,49 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port ${PORT:-7860}
 
 ### Next Steps / High Priority
 
-1. **Check HF Space build** — verify the Docker build completes and the chatbot is accessible
-2. **Replace synthetic inventory** — swap `07_inventory.md` with real dealership data
-3. **Authentication** — add password/API key before sharing publicly
+1. ~~**Check HF Space build** — verify the Docker build completes and the chatbot is accessible~~ **Done**
+2. ~~**Replace synthetic inventory** — decided to keep synthetic for demo portfolio~~ **Skipped**
+3. ~~**Authentication** — add password/API key before sharing publicly~~ **Pending**
 4. **Koyeb** — try if HF Spaces free tier sleep policy is an issue
+
+---
+
+## Session 3 — What Was Done
+
+| Task | Status |
+|------|--------|
+| HF Space build fixed and deployed | Done |
+| YAML config header added to README.md (sdk: docker, app_port: 7860) | Done |
+| Dockerfile fixed for HF Spaces (USER user, --chown=user) | Done |
+| Groq model updated: llama3-8b-8192 → llama-3.1-8b-instant | Done |
+| facts.json created — curated ground-truth dealership info | Done |
+| 08_inventory_summary.md created — full inventory overview by make/model/price | Done |
+| Injection protection (3 layers): hardened prompt, delimiter isolation, ground truth cross-reference | Done |
+| Vehicle image previews via Pollinations.ai — premium aesthetic prompts | Done |
+| vehicle_images.json generated (500 images, URLs only, ~15KB) | Done |
+| enrich_inventory.py updated with Vehicle ID field for exact image matching | Done |
+| Chat UI now renders image gallery when vehicles are mentioned | Done |
+
+### Files Created This Session
+
+| File | Purpose |
+|------|---------|
+| `app/facts.json` | Curated ground-truth facts injected into system prompt |
+| `app/vehicle_images.json` | 500 Pollinations.ai premium image URLs |
+| `knowledge_base/08_inventory_summary.md` | Full inventory summary by make/model/price |
+| `scripts/generate_vehicle_images.py` | Generates image URLs from vehicles.csv |
+| `scripts/inventory_summary.py` | Generates inventory summary from CSV |
+| `scripts/test_injection.py` | Injection safety test suite |
+
+### Files Modified This Session
+
+| File | Change |
+|------|--------|
+| `app/rag_engine.py` | Loads facts.json + vehicle_images.json, hardened system prompt with safety rules, delimiter isolation, image matching in answer() |
+| `app/main.py` | Added `images: list = []` to ChatResponse |
+| `app/static/index.html` | Image gallery rendering in chat bubbles, CSS for gallery |
+| `scripts/enrich_inventory.py` | Added Vehicle ID field for chunk→image matching |
+| `README.md` | Added YAML header for HF Spaces config |
+| `Dockerfile` | Fixed user permissions for HF Spaces |
+| `app/config.py` | Updated LLM_MODEL to llama-3.1-8b-instant |
+| `progress.md` | Updated throughout |

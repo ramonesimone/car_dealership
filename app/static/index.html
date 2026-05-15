@@ -111,6 +111,15 @@
   }
   .agent-badge.bob { background: #9333ea22; color: #c084fc; border: 1px solid #9333ea44; }
   .agent-badge.june { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e44; }
+  .image-gallery { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .image-gallery img {
+    width: 100%; max-width: 180px; height: 120px; object-fit: cover;
+    border-radius: 8px; border: 1px solid #2a2f3e;
+    transition: transform 0.2s, border-color 0.2s; cursor: pointer;
+  }
+  .image-gallery img:hover { transform: scale(1.03); border-color: #e63946; }
+  .image-gallery img.loading { opacity: 0.5; }
+  @media (max-width: 600px) { .image-gallery img { max-width: 140px; height: 100px; } }
   .welcome {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     flex: 1; text-align: center; padding: 40px 20px;
@@ -198,7 +207,7 @@ function onLangChange() { /* language preference stored in selector */ }
 
 input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
 
-function addMessage(role, content, sources, agent) {
+function addMessage(role, content, sources, agent, images) {
   welcome?.remove();
   const div = document.createElement('div');
   div.className = 'message ' + role;
@@ -219,6 +228,22 @@ function addMessage(role, content, sources, agent) {
   }
 
   bubble.innerHTML += formatContent(content);
+
+  if (images && images.length > 0) {
+    const gallery = document.createElement('div');
+    gallery.className = 'image-gallery';
+    images.forEach(img => {
+      const imgEl = document.createElement('img');
+      imgEl.loading = 'lazy';
+      imgEl.className = 'loading';
+      imgEl.alt = img.year + ' ' + img.make + ' ' + img.model;
+      imgEl.onload = function () { this.className = ''; };
+      imgEl.onerror = function () { this.remove(); };
+      imgEl.src = img.url;
+      gallery.appendChild(imgEl);
+    });
+    bubble.appendChild(gallery);
+  }
 
   if (sources && sources.length > 0) {
     const srcDiv = document.createElement('div');
@@ -288,7 +313,7 @@ async function sendMessage() {
     });
     const data = await res.json();
     removeTyping();
-    addMessage('assistant', data.reply, data.sources, data.agent);
+    addMessage('assistant', data.reply, data.sources, data.agent, data.images);
     history.push({ role: 'assistant', content: data.reply });
   } catch (err) {
     removeTyping();

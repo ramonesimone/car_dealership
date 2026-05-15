@@ -27,6 +27,7 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     reply: str
     sources: list
+    images: list = []
     agent: str
 
 
@@ -45,7 +46,7 @@ def health():
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
     result = engine.answer(req.message, req.history, req.language, req.agent)
-    return ChatResponse(reply=result["reply"], sources=result["sources"], agent=result["agent"])
+    return ChatResponse(reply=result["reply"], sources=result["sources"], images=result.get("images", []), agent=result["agent"])
 
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
