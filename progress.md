@@ -310,8 +310,8 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port ${PORT:-7860}
 | facts.json created — curated ground-truth dealership info | Done |
 | 08_inventory_summary.md created — full inventory overview by make/model/price | Done |
 | Injection protection (3 layers): hardened prompt, delimiter isolation, ground truth cross-reference | Done |
-| Vehicle image previews via Pollinations.ai — premium aesthetic prompts | Done |
-| vehicle_images.json generated (500 images, URLs only, ~15KB) | Done |
+| 500 real vehicle images downloaded to app/static/images/ as .webp | Done |
+| vehicle_images.json regenerated with local image paths instead of Pollinations.ai URLs | Done |
 | enrich_inventory.py updated with Vehicle ID field for exact image matching | Done |
 | Chat UI now renders image gallery when vehicles are mentioned | Done |
 
@@ -320,7 +320,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port ${PORT:-7860}
 | File | Purpose |
 |------|---------|
 | `app/facts.json` | Curated ground-truth facts injected into system prompt |
-| `app/vehicle_images.json` | 500 Pollinations.ai premium image URLs |
+| `app/vehicle_images.json` | 500 local vehicle image paths |
 | `knowledge_base/08_inventory_summary.md` | Full inventory summary by make/model/price |
 | `scripts/generate_vehicle_images.py` | Generates image URLs from vehicles.csv |
 | `scripts/inventory_summary.py` | Generates inventory summary from CSV |
@@ -343,7 +343,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port ${PORT:-7860}
 ---
 
 *Handoff: May 15, 2026 — Session 3 (final)*
-*Stack: Python 3.12, FastAPI, Groq API, sentence-transformers, ChromaDB, HF Spaces, Pollinations.ai*
+*Stack: Python 3.12, FastAPI, Groq API, sentence-transformers, ChromaDB, HF Spaces*
 
 **Live URL:** https://adedapoojo-car-dealership-chatbot.hf.space
 **GitHub:** https://github.com/ramonesimone/car_dealership

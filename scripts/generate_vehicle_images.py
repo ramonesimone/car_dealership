@@ -1,4 +1,8 @@
-"""Generate premium Pollinations.ai image URLs for each vehicle in the inventory."""
+"""Generate local image paths for each vehicle in the inventory.
+
+Images live in app/static/images/vehicle_{id}.webp.
+This script creates the vehicle_images.json mapping each vehicle ID to its local path.
+"""
 
 import csv
 import json
@@ -8,22 +12,6 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 APP_DIR = Path(__file__).resolve().parent.parent / "app"
 CSV_PATH = DATA_DIR / "vehicles.csv"
 OUTPUT_PATH = APP_DIR / "vehicle_images.json"
-
-
-def build_image_url(row):
-    year = row["year"]
-    make = row["make"]
-    model = row["model"]
-    color = row["color"]
-    condition = row["condition"]
-
-    aesthetic_prompt = (
-        f"{year} {make} {model} in {color} "
-        f"professional automotive photography studio lighting dramatic angle "
-        f"ultra realistic 4K showroom condition detailed reflections sharp focus"
-    )
-    encoded = aesthetic_prompt.replace(" ", "%20")
-    return f"https://image.pollinations.ai/prompt/{encoded}"
 
 
 def main():
@@ -39,7 +27,7 @@ def main():
     for v in vehicles:
         vid = v["vehicle_id"]
         images[vid] = {
-            "url": build_image_url(v),
+            "url": f"/images/vehicle_{vid}.webp",
             "year": v["year"],
             "make": v["make"],
             "model": v["model"],
@@ -51,7 +39,7 @@ def main():
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         json.dump(images, f, indent=2)
 
-    print(f"Generated {len(images)} image URLs → {OUTPUT_PATH}")
+    print(f"Generated {len(images)} local image paths → {OUTPUT_PATH}")
 
 
 if __name__ == "__main__":
